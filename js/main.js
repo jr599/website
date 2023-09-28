@@ -102,36 +102,22 @@ $(document).ready(function() {
     // Initialize Modals
     handleModal("mortgageBtn", "mortgageModal", "mortgageClose");
     handleModal("recipeBtn", "recipeModal", "recipeClose");
-});
 
 
 
 
-// Added socket details
 
-const socket = io.connect('http://localhost:4000');
 
-let priceData = [];
-const ctx = document.getElementById('priceChart').getContext('2d');
-const priceChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: Array.from({ length: 10 }, (_, i) => i),
-    datasets: [
-      {
-        label: 'Bitcoin Price (USD)',
-        data: priceData,
-        borderColor: 'blue',
-      },
-    ],
-  },
-});
 
-socket.on('updatePrice', (price) => {
-  priceData.push(price);
+    async function fetchBitcoinPrice() {
+        const response = await fetch('http://localhost:5000/bitcoin_price');
+        const data = await response.json();
+        document.getElementById('bitcoin-price').innerText = data.price;
+    };
 
-  // Keep only the last 10 data points
-  if (priceData.length > 10) priceData.shift();
+    // Fetch Bitcoin price when the document is ready
+    fetchBitcoinPrice();
 
-  priceChart.update();
+    // Update every 5 seconds
+    setInterval(fetchBitcoinPrice, 5000);
 });
