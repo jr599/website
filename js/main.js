@@ -103,3 +103,35 @@ $(document).ready(function() {
     handleModal("mortgageBtn", "mortgageModal", "mortgageClose");
     handleModal("recipeBtn", "recipeModal", "recipeClose");
 });
+
+
+
+
+// Added socket details
+
+const socket = io.connect('http://localhost:4000');
+
+let priceData = [];
+const ctx = document.getElementById('priceChart').getContext('2d');
+const priceChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: Array.from({ length: 10 }, (_, i) => i),
+    datasets: [
+      {
+        label: 'Bitcoin Price (USD)',
+        data: priceData,
+        borderColor: 'blue',
+      },
+    ],
+  },
+});
+
+socket.on('updatePrice', (price) => {
+  priceData.push(price);
+
+  // Keep only the last 10 data points
+  if (priceData.length > 10) priceData.shift();
+
+  priceChart.update();
+});
